@@ -1,12 +1,12 @@
+require 'test/unit'
 require 'mascot/mgf'
-
 class TestMascotMgf < Test::Unit::TestCase
   def setup
-    @mgf_file = File.open(File.expand_path("example.mgf"))
+    @mgf_file = File.open(File.expand_path("test/fixtures/example.mgf"))
   end
 
   def test_canary
-    asset true, "The canary does not sing"
+    assert true, "The canary does not sing"
   end
   
   def test_open_file
@@ -17,22 +17,20 @@ class TestMascotMgf < Test::Unit::TestCase
   def test_get_first_and_second_query_string
     mgf = Mascot::MGF.open(@mgf_file)
     assert_not_nil mgf
-    first_query =File.read("fixtures/first_query.mgf")
-    first_query.strip!
-    assert_equal(mgf.readquery(), first_query)
-    second_query =File.read("fixtures/second_query.mgf")
-    second_query.strip!
-    assert_equal(mgf.readquery(), second_query)
+    first_query =File.read("test/fixtures/first_query.mgf")
+    # first_query = first_query.strip.chomp
+    assert_equal(first_query,mgf.readquery())
+    second_query =File.read("test/fixtures/second_query.mgf")
+    # second_query = second_query.strip.chomp
+    assert_equal( second_query,mgf.readquery())
   end
 
   def test_get_tenth_query_string
     mgf = Mascot::MGF.open(@mgf_file)
     assert_not_nil mgf
-    tenth_query =File.read("fixtures/tenth_query.mgf")
-    tenth_query.strip!
+    tenth_query =File.read("test/fixtures/tenth_query.mgf")
     # move cursor to tenth query
-    mgf.pos = mgf.idx[9][0]
-    assert_equal(mgf.readquery(), tenth_query)
+    assert_equal(tenth_query,mgf.readquery(9))
   end
 
   def test_get_tenth_query_object
@@ -49,10 +47,26 @@ class TestMascotMgf < Test::Unit::TestCase
     tenth_query_charge = 2
     # move cursor to tenth query
     tenth_query = mgf.query(9)
-    assert_equal(tenth_query.title, tenth_query_title)
-    assert_equal(tenth_query.rtinseconds, tenth_query_rtinseconds)
-    assert_equal(tenth_query.charge, tenth_query_charge)
-    assert_equal(tenth_query.pepmass[0], tenth_query_pepmass[0])
-    assert_equal(tenth_query.pepmass[1], tenth_query_pepmass[1])
-  end    
+    assert_equal(tenth_query_title, tenth_query.title)
+    assert_equal(tenth_query_rtinseconds, tenth_query_rtinseconds)
+    assert_equal(tenth_query_charge, tenth_query.charge)
+    assert_equal(tenth_query_pepmass[0], tenth_query.pepmass[0])
+    assert_equal(tenth_query_pepmass[1], tenth_query.pepmass[1])
+  end
+  
+  def test_query_count
+    mgf = Mascot::MGF.open(@mgf_file)
+    assert_equal(13, mgf.query_count)
+  end
+
+  def test_create_cached_index
+    mgf = Mascot::MGF.open(@mgf_file)
+    assert(File.exists?(mgf.full_path + ".idx"))
+  end
+  def test_skip_cached_index
+    # delete the index if it exists
+    File.unlink(@mgf_file.path + ".idx")
+    mgf = Mascot::MGF.open(@mgf_file, "r", false)
+    assert(!File.exists?(mgf.full_path + ".idx"))
+  end
 end

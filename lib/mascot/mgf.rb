@@ -1,20 +1,22 @@
-require 'mascot/mgf/query'
 module Mascot
   class MGF < File
-    VERSION = "0.2.0"
-    
-    attr_reader :idx
-    
+    require 'mascot/mgf/query'
+    attr_reader :idx, :full_path
     def initialize(mgf_file_path,open_mode="r",cache_index=true)
-      super(mgf_file_path,open_mode)
-      @full_path = File.expand(mgf_file_path)
+      super(mgf_file_path, open_mode)
+      @full_path = File.expand_path(mgf_file_path)
       @cache_index = cache_index
       @curr_index = 0
       @idx = {}
       parse_index()
     end
-    def readquery
-      bytelength = @idx[@curr_index][1] - @idx[@curr_index][0] 
+
+    def readquery(n=nil)
+      if n
+        @curr_index = n
+      end
+      self.pos = @idx[@curr_index][0]
+      bytelength = @idx[@curr_index][1] - @idx[@curr_index][0]
       @curr_index += 1
       self.read(bytelength)
     end
@@ -26,26 +28,21 @@ module Mascot
     end
 
     def query(n=nil)
-      if n
-        self.pos = @idx[n][0]
-      end
-      parse_next_query(@idx[n][1])
+      Mascot::MGF::Query.new(self.readquery(n))
+    end
+    
+    # reports how many queries are in this MGF file
+    def query_count()
+      return @idx.length
     end
 
     private
-    
-    def parse_next_query(bytelength)
-      return nil if self.eof?
-      # move the idx cursor forward
-      @curr_index += 1
-      Mascot::MGF::Query.new(self.read(bytelength))
-    end
 
     def parse_index()
       if File.exists?(@full_path + ".idx")
         # read the index from file
         idx_file = File.open(@full_path + ".idx",'rb')
-        @idx = Marshall.load(idx_file)
+        @idx = ::Marshal.load(idx_file)
         idx_file.close
       else
         create_index()
@@ -67,7 +64,7 @@ module Mascot
       end   
       if @cache_index
         idx_file = File.open(@full_path + ".idx",'wb')
-        idx_file.print(Marshal.dump(@idx))s
+        idx_file.print(::Marshal.dump(@idx))
         idx_file.close
       end
       # place cursor at beginning of file again
