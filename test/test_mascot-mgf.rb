@@ -14,39 +14,45 @@ class TestMascotMgf < Test::Unit::TestCase
     assert_not_nil mgf
   end
   
-  def test_get_first_query
+  def test_get_first_and_second_query_string
     mgf = Mascot::MGF.open(@mgf_file)
     assert_not_nil mgf
-    first_query =<<EOF
-BEGIN IONS
-TITLE=example.9.9.2
-RTINSECONDS=318.0218
-PEPMASS=1019.0322875976562 563.95965576171875
-CHARGE=2
-484.3849487 0.5770078897
-572.6119385 0.5543299913
-603.659668 0.7869901657
-612.3583984 0.7114390135
-740.4682617 1.021142125
-796.2832031 1.051657796
-832.2305908 0.519821763
-843.5834961 0.514819622
-865.2956543 1.33468771
-883.6113281 0.9751986265
-913.4781494 0.4968527555
-946.2431641 0.4950940609
-956.1906738 0.4559304714
-966.5097656 2.257080078
-982.8709717 1.082980752
-1058.980347 1.822528481
-1070.601807 0.9599312544
-1110.454956 0.5712217093
-1171.136475 1.172691107
-END IONS
-EOF
+    first_query =File.read("fixtures/first_query.mgf")
     first_query.strip!
     assert_equal(mgf.readquery(), first_query)
+    second_query =File.read("fixtures/second_query.mgf")
+    second_query.strip!
+    assert_equal(mgf.readquery(), second_query)
   end
-  
-    
+
+  def test_get_tenth_query_string
+    mgf = Mascot::MGF.open(@mgf_file)
+    assert_not_nil mgf
+    tenth_query =File.read("fixtures/tenth_query.mgf")
+    tenth_query.strip!
+    # move cursor to tenth query
+    mgf.pos = mgf.idx[9][0]
+    assert_equal(mgf.readquery(), tenth_query)
+  end
+
+  def test_get_tenth_query_object
+    mgf = Mascot::MGF.open(@mgf_file)
+    assert_not_nil mgf
+    # BEGIN IONS
+    # TITLE=example.123.123.2
+    # RTINSECONDS=760.3257
+    # PEPMASS=643.77874755859375 367.44775390625
+    # CHARGE=2
+    tenth_query_title = 'example.123.123.2'
+    tenth_query_rtinseconds = 760.3257
+    tenth_query_pepmass = [643.77874755859375, 367.44775390625]
+    tenth_query_charge = 2
+    # move cursor to tenth query
+    tenth_query = mgf.query(9)
+    assert_equal(tenth_query.title, tenth_query_title)
+    assert_equal(tenth_query.rtinseconds, tenth_query_rtinseconds)
+    assert_equal(tenth_query.charge, tenth_query_charge)
+    assert_equal(tenth_query.pepmass[0], tenth_query_pepmass[0])
+    assert_equal(tenth_query.pepmass[1], tenth_query_pepmass[1])
+  end    
 end
