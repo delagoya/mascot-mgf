@@ -1,8 +1,8 @@
 module Mascot
   class MGF < File
     require 'mascot/mgf/query'
-    attr_reader :idx, :full_path
-    def initialize(mgf_file_path,open_mode="r",cache_index=true)
+    attr_reader :idx, :full_path, :curr_index
+    def initialize(mgf_file_path,cache_index=true,open_mode="r")
       super(mgf_file_path, open_mode)
       @full_path = File.expand_path(mgf_file_path)
       @cache_index = cache_index
@@ -11,6 +11,11 @@ module Mascot
       parse_index()
     end
 
+    def rewind
+      super
+      @curr_index = 0      
+    end
+    
     def readquery(n=nil)
       if n
         @curr_index = n
@@ -26,6 +31,13 @@ module Mascot
         yield self.query() if block_given?
       end
     end
+
+    # alias_method :io_each, :each 
+    # def each 
+    #   while !self.eof?
+    #     yield self.readquery if block_given?
+    #   end
+    # end
 
     def query(n=nil)
       Mascot::MGF::Query.new(self.readquery(n))

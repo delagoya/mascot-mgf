@@ -66,7 +66,17 @@ class TestMascotMgf < Test::Unit::TestCase
   def test_skip_cached_index
     # delete the index if it exists
     File.unlink(@mgf_file.path + ".idx")
-    mgf = Mascot::MGF.open(@mgf_file, "r", false)
+    mgf = Mascot::MGF.open(@mgf_file,false)
     assert(!File.exists?(mgf.full_path + ".idx"))
+  end
+  def test_rewind_override
+    mgf = Mascot::MGF.open(@mgf_file,false)
+    first_query = mgf.query()
+    second_query = mgf.query()
+    mgf.rewind
+    assert_equal(0,mgf.curr_index)
+    assert_equal(first_query.title, mgf.query().title)
+    assert_equal(1,mgf.curr_index)
+    assert_equal(second_query.title, mgf.query().title)
   end
 end

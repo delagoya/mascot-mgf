@@ -18,29 +18,34 @@ A simple object that represents individual MS/MS spectrum objects in an MGF file
 
 == Simple Usage Examples
 
+=== Reading 
+
     require 'mascot/mgf'
 
+    # This opens a MGF file and builds an index of the query 
+    # positions. The index is cached to the filesystem.
     mgf = Mascot::MGF.open("some/file/path.mgf")
 
-		# read the next query where the cursor is place as a 
-		# text representation of the Mascot::MGF::Query
-    query_string = mgf.readquery()
-		puts query_string
+    # Same thing as above, but does not cache the index to filesystem
+    mgf = Mascot::MGF.open("some/file/path.mgf",false)
 
-		# Create a Mascot::MGF::Query 
+    # How many queries are in this file?
+    mgf.query_count
+		# Reads the next query from the read cursor position
+    query_string = mgf.readquery()
+
+		# Create a Mascot::MGF::Query from the query string
 		query = Mascot::Query.new(query_string)
     puts query.title
 
-		# Same thing straight from Mascot::MGF
+		# Read the next query as a Mascot::MGF::Query object
 		query = mgf.query()
 		puts query.title
-		
 
-    mgf.each_query do |query_string|
-      # do something with query...
-    end
-
-		mgf.each do |query_object|  
+		# puts cursor at begining of MGF file
+		mgf.rewind
+    mgf.each_query do |query_object|
       # do something with query...
     end
 		
+
