@@ -13,9 +13,9 @@ module Mascot
 
     def rewind
       super
-      @curr_index = 0      
+      @curr_index = 0
     end
-    
+
     def readquery(n=nil)
       if n
         @curr_index = n
@@ -25,15 +25,15 @@ module Mascot
       @curr_index += 1
       self.read(bytelength)
     end
-    
+
     def each_query
       while !self.eof?
         yield self.query() if block_given?
       end
     end
 
-    # alias_method :io_each, :each 
-    # def each 
+    # alias_method :io_each, :each
+    # def each
     #   while !self.eof?
     #     yield self.readquery if block_given?
     #   end
@@ -42,7 +42,7 @@ module Mascot
     def query(n=nil)
       Mascot::MGF::Query.new(self.readquery(n))
     end
-    
+
     # reports how many queries are in this MGF file
     def query_count()
       return @idx.length
@@ -73,7 +73,7 @@ module Mascot
         when "END"
           @idx[-1][1] = self.pos
         end
-      end   
+      end
       if @cache_index
         idx_file = File.open(@full_path + ".idx",'wb')
         idx_file.print(::Marshal.dump(@idx))

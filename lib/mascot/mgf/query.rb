@@ -27,7 +27,7 @@ module Mascot
           tmp += "#{k.to_s.upcase}=#{v}\n"
         end
         tmp += @ions.collect { |i| i.join(" ")}.join("\n")
-        tmp += "\nqEND IONS\n"
+        tmp += "\nEND IONS\n"
         return tmp
       end
 
