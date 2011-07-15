@@ -8,12 +8,12 @@ class TestMascotMgf < Test::Unit::TestCase
   def test_canary
     assert true, "The canary does not sing"
   end
-  
+
   def test_open_file
     mgf = Mascot::MGF.open(@mgf_file)
     assert_not_nil mgf
   end
-  
+
   def test_get_first_and_second_query_string
     mgf = Mascot::MGF.open(@mgf_file)
     assert_not_nil mgf
@@ -53,7 +53,7 @@ class TestMascotMgf < Test::Unit::TestCase
     assert_equal(tenth_query_pepmass[0], tenth_query.pepmass[0])
     assert_equal(tenth_query_pepmass[1], tenth_query.pepmass[1])
   end
-  
+
   def test_query_count
     mgf = Mascot::MGF.open(@mgf_file)
     assert_equal(13, mgf.query_count)
@@ -78,5 +78,10 @@ class TestMascotMgf < Test::Unit::TestCase
     assert_equal(first_query.title, mgf.query().title)
     assert_equal(1,mgf.curr_index)
     assert_equal(second_query.title, mgf.query().title)
+  end
+  def test_query_to_s
+    first_query =File.read("test/fixtures/first_query.mgf")
+    mgf = Mascot::MGF.open("test/fixtures/first_query.mgf")
+    assert_equal(first_query, mgf.query.to_s)
   end
 end
