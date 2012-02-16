@@ -39,6 +39,7 @@ module Mascot
     #   end
     # end
 
+    # 0-based index
     def query(n=nil)
       Mascot::MGF::Query.new(self.readquery(n))
     end

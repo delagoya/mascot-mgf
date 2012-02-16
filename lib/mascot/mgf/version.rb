@@ -1,5 +1,5 @@
 module Mascot
-  class MGF
-    VERSION = "0.2.1"
+  class MGF < File
+    VERSION = "0.2.2"
   end
 end
