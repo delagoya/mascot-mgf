@@ -2,7 +2,7 @@ module Mascot
   class MGF
     class Query
 
-      attr_accessor :ions, :title, :pepmass, :entry, :charge
+      attr_accessor :ions, :title, :pepmass, :entry, :charge, :rtinseconds
 
       # Initializes a spectrum entry from a MGF formatted string or from an Array
       # that is the newline split of MGF 'BEGIN IONS\n...\nEND IONS'
@@ -15,6 +15,7 @@ module Mascot
         @atts = {}
         @ions = []
         @charge = nil
+        @rtinseconds = nil
         parse(entry)
       end
 
@@ -52,6 +53,8 @@ module Mascot
               @title = $2
             when "CHARGE"
               @charge = $2.to_i
+            when "RTINSECONDS"
+              @rtinseconds = $2.to_f
             else
               @atts[$1.downcase.to_sym] = $2
             end

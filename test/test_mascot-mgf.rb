@@ -48,7 +48,7 @@ class TestMascotMgf < Test::Unit::TestCase
     # move cursor to tenth query
     tenth_query = mgf.query(9)
     assert_equal(tenth_query_title, tenth_query.title)
-    assert_equal(tenth_query_rtinseconds, tenth_query_rtinseconds)
+    assert_equal(tenth_query_rtinseconds, tenth_query.rtinseconds)
     assert_equal(tenth_query_charge, tenth_query.charge)
     assert_equal(tenth_query_pepmass[0], tenth_query.pepmass[0])
     assert_equal(tenth_query_pepmass[1], tenth_query.pepmass[1])
